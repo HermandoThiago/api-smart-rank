@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: smartrank-api
+    ports:
+      - '3001:8080'
+    volumes:
+      - .:/home/node/app
+    networks:
+      - server-network
+
+  mongodb:
+    image: mongo:5.0.0
+    container_name: server-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    networks:
+      - server-network
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+
+networks:
+  server-network:
