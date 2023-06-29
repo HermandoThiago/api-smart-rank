@@ -8,7 +8,9 @@ export class PlayersService {
 
   private logger = new Logger(PlayersService.name);
 
-  async findAll() {
+  async findAll(email?: string) {
+    if (email) return this.findByEmail(email);
+
     return this.players;
   }
 

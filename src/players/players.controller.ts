@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -10,8 +18,8 @@ export class PlayersController {
 
   @ApiOperation({ description: 'Find all players' })
   @Get()
-  async findAll() {
-    return await this.playerService.findAll();
+  async findAll(@Query('email') email: string) {
+    return await this.playerService.findAll(email);
   }
 
   @ApiOperation({ description: 'Create a new player' })
