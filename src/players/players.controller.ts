@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { PlayersService } from './players.service';
-import { CreatePlayerDto } from './dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreatePlayerDto, UpdatePlayerDto } from './dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('players')
 @Controller('/players')
@@ -17,18 +17,38 @@ export class PlayersController {
   constructor(private readonly playerService: PlayersService) {}
 
   @ApiOperation({ description: 'Find all players' })
+  @ApiResponse({ status: 200, description: 'Successful search' })
   @Get()
-  async findAll(@Query('email') email: string) {
-    return await this.playerService.findAll(email);
+  async findAll() {
+    return await this.playerService.findAll();
+  }
+
+  @ApiOperation({ description: 'Find player by id' })
+  @ApiResponse({ status: 200, description: 'Successful search' })
+  @ApiResponse({ status: 404, description: 'Player not found' })
+  @Get(':playerId')
+  async findByEmail(@Param('playerId') playerId: string) {
+    return await this.playerService.findById(playerId);
   }
 
   @ApiOperation({ description: 'Create a new player' })
+  @ApiResponse({ status: 201, description: 'Player created successfully' })
   @Post()
   async createAndUpdate(@Body() payload: CreatePlayerDto) {
-    return await this.playerService.createAndUpdatePlayer(payload);
+    return await this.playerService.create(payload);
+  }
+
+  @ApiOperation({ description: 'Update player by id' })
+  @Patch(':playerId')
+  async update(
+    @Param('playerId') playerId: string,
+    @Body() payload: UpdatePlayerDto,
+  ) {
+    return await this.playerService.update(playerId, payload);
   }
 
   @ApiOperation({ description: 'Delete player by id' })
+  @ApiResponse({ status: 200, description: 'Successfully deleted player' })
   @Delete(':playerId')
   async delete(@Param('playerId') playerId: string) {
     return await this.playerService.delete(playerId);

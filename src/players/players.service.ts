@@ -1,5 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreatePlayerDto } from './dto';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreatePlayerDto, UpdatePlayerDto } from './dto';
 import { Player } from './interfaces';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,48 +17,33 @@ export class PlayersService {
     @InjectModel('player') private readonly playerModel: Model<Player>,
   ) {}
 
-  async findAll(email?: string) {
-    if (email) return this.findByEmail(email);
-
+  async findAll() {
     const players = await this.playerModel.find().exec();
 
     return players;
   }
 
-  async createAndUpdatePlayer(payload: CreatePlayerDto) {
-    const { email } = payload;
-
-    const playerIsExist = await this.playerModel.findOne({ email }).exec();
-
-    if (playerIsExist) {
-      const updatedPlayer = this.update(payload);
-
-      return updatedPlayer;
-    }
-
-    const createdPlayer = await this.create(payload);
-
-    return createdPlayer;
-  }
-
-  async delete(playerId: string) {
-    const deletedPlayer = await this.playerModel.findOneAndRemove({
-      _id: playerId,
-    });
-
-    return deletedPlayer;
-  }
-
-  private async findByEmail(email: string) {
-    const existsPlayer = await this.playerModel.findOne({ email }).exec();
+  async findById(playerId: string) {
+    const existsPlayer = await this.playerModel
+      .findOne({ _id: playerId })
+      .exec();
 
     if (!existsPlayer)
-      throw new NotFoundException(`Player with email: ${email} not found`);
+      throw new NotFoundException(
+        `Player with playerId: ${playerId} not found`,
+      );
 
     return existsPlayer;
   }
 
-  private async create(payload: CreatePlayerDto) {
+  async create(payload: CreatePlayerDto) {
+    const { email } = payload;
+
+    const playerIsExist = await this.playerModel.findOne({ email }).exec();
+
+    if (playerIsExist)
+      throw new ConflictException(`Player with this email already exists.`);
+
     const newPlayer = new this.playerModel(payload);
 
     const createdPlayer = await newPlayer.save();
@@ -66,12 +56,23 @@ export class PlayersService {
     return createdPlayer;
   }
 
-  private async update(updatePlayer: CreatePlayerDto) {
-    const { email } = updatePlayer;
+  async delete(playerId: string) {
+    const deletedPlayer = await this.playerModel.findOneAndRemove({
+      _id: playerId,
+    });
 
+    this.logger.log(`Player with id: ${playerId} has been deleted`);
+
+    return deletedPlayer;
+  }
+
+  async update(playerId: string, payload: UpdatePlayerDto) {
     const updatedPlayer = await this.playerModel
-      .findOneAndUpdate({ email }, { $set: updatePlayer })
+      .findOneAndUpdate({ _id: playerId }, { $set: payload })
       .exec();
+
+    this.logger.log(`Updated player ${payload.name}`);
+    this.logger.verbose({ payload });
 
     return updatedPlayer;
   }
