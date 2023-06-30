@@ -23,10 +23,10 @@ export class PlayersService {
   async createAndUpdatePlayer(payload: CreatePlayerDto) {
     const { email } = payload;
 
-    const playerIsExist = await this.findByEmail(email);
+    const playerIsExist = await this.playerModel.findOne({ email }).exec();
 
     if (playerIsExist) {
-      const updatedPlayer = this.update(playerIsExist, payload);
+      const updatedPlayer = this.update(payload);
 
       return updatedPlayer;
     }
@@ -37,14 +37,11 @@ export class PlayersService {
   }
 
   async delete(playerId: string) {
-    // const existsPlayer = this.players.find((player) => player._id === playerId);
-    // if (!existsPlayer)
-    //   throw new NotFoundException(`Player with id ${playerId} not found!`);
-    // const updatedPlayers = this.players.filter(
-    //   (player) => player._id !== playerId,
-    // );
-    // this.players = updatedPlayers;
-    // this.logger.log(`Player with id ${playerId} has been removed!`);
+    const deletedPlayer = await this.playerModel.findOneAndRemove({
+      _id: playerId,
+    });
+
+    return deletedPlayer;
   }
 
   private async findByEmail(email: string) {
@@ -67,35 +64,15 @@ export class PlayersService {
     this.logger.verbose({ newPlayer });
 
     return createdPlayer;
-
-    // const _id = this.players.length + 1;
-
-    // const player: Player = {
-    //   _id: _id.toString(),
-    //   name,
-    //   phoneNumber,
-    //   email,
-    //   ranking: 'A',
-    //   rankingPosition: 1,
-    //   urlPhoto: 'https://localhost:3000/photo',
-    // };
-
-    // this.players.push(player);
-
-    // this.logger.log(`Create player ${name} with email ${email}`);
-    // this.logger.verbose({ player });
-
-    // return player;
   }
 
-  private async update(existsPlayer: Player, updatePlayer: CreatePlayerDto) {
-    const { name } = updatePlayer;
+  private async update(updatePlayer: CreatePlayerDto) {
+    const { email } = updatePlayer;
 
-    existsPlayer.name = name;
+    const updatedPlayer = await this.playerModel
+      .findOneAndUpdate({ email }, { $set: updatePlayer })
+      .exec();
 
-    this.logger.log(`Player with id ${existsPlayer._id} has been updated.`);
-    this.logger.verbose({ updatePlayer });
-
-    return existsPlayer;
+    return updatedPlayer;
   }
 }
