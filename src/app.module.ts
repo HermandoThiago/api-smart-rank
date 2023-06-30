@@ -6,10 +6,7 @@ import { PlayersModule } from './players/players.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(
-      'mongodb://admin:admin@localhost:27017/smartrank',
-      {},
-    ),
+    MongooseModule.forRoot('mongodb://admin:admin@mongodb:27017'),
     PlayersModule,
   ],
   controllers: [],

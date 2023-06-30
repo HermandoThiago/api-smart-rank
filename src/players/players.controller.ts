@@ -11,8 +11,8 @@ import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Players')
-@Controller('api/v1/players')
+@ApiTags('players')
+@Controller('/players')
 export class PlayersController {
   constructor(private readonly playerService: PlayersService) {}
 

@@ -8,11 +8,12 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Api SmartRank')
     .setVersion('1.0')
+    .setDescription('')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('doc', app, document);
 
-  await app.listen(8080);
+  await app.listen(3010);
 }
 bootstrap();
