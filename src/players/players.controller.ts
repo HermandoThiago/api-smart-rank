@@ -18,6 +18,10 @@ export class PlayersController {
 
   @ApiOperation({ description: 'Find all players' })
   @ApiResponse({ status: 200, description: 'Successful search' })
+  @ApiResponse({
+    status: 409,
+    description: 'Player with this email already exists',
+  })
   @Get()
   async findAll() {
     return await this.playerService.findAll();
