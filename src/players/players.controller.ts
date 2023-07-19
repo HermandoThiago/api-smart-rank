@@ -34,11 +34,13 @@ export class PlayersController {
   @ApiOperation({ description: 'Create a new player' })
   @ApiResponse({ status: 201, description: 'Player created successfully' })
   @Post()
-  async createAndUpdate(@Body() payload: CreatePlayerDto) {
+  async create(@Body() payload: CreatePlayerDto) {
     return await this.playerService.create(payload);
   }
 
   @ApiOperation({ description: 'Update player by id' })
+  @ApiResponse({ status: 200, description: 'Player updated successfully' })
+  @ApiResponse({ status: 404, description: 'Player not found' })
   @Patch(':playerId')
   async update(
     @Param('playerId') playerId: string,
@@ -49,6 +51,7 @@ export class PlayersController {
 
   @ApiOperation({ description: 'Delete player by id' })
   @ApiResponse({ status: 200, description: 'Successfully deleted player' })
+  @ApiResponse({ status: 404, description: 'Player not found' })
   @Delete(':playerId')
   async delete(@Param('playerId') playerId: string) {
     return await this.playerService.delete(playerId);
